@@ -11,48 +11,62 @@ import io.quarkus.test.junit.QuarkusTest;
 @QuarkusTest
 public class CityEndpointTest {
 
-    @Test
-    public void testListAllCity() {
-        //List all, should have Montpellier the database has initially:
-        given()
-                .when().get("/city")
-                .then()
-                .statusCode(200)
-                .body(
-                        containsString("Montpellier")
-                        );
+        @Test
+        public void testAddNewCity() {
+                // List all, should have Montpellier the database has initially:
+                given()
+                                .when().get("/city")
+                                .then()
+                                .statusCode(200)
+                                .body(
+                                                containsString("Montpellier"),
+                                                containsString("Paris"),
+                                                containsString("Avignon"));
 
-        //Create Paris:
-        given()
-                .when()
-                .body("{\"name\" : \"Pear\"}")
-                .contentType("application/json")
-                .post("/fruit")
-                .then()
-                .statusCode(201);
+                // Create Bordeaux:
+                given()
+                                .when()
+                                .body("{\"name\" : \"Bordeaux\", \"department_code\" : \"33800\", \"insee_code\" : \"33063\", \"zip_code\" : \"33000\", \"lat\" : 44.837789, \"lon\" : -0.57918}")
+                                .contentType("application/json")
+                                .post("/city")
+                                .then()
+                                .statusCode(201);
 
-        //List all, cherry should be missing now:
-        given()
-                .when().get("/fruits")
-                .then()
-                .statusCode(200)
-                .body(
-                        not(containsString("Cherry")),
-                        containsString("Apple"),
-                        containsString("Banana"));
+                // List all, Bordeaux should be present now:
+                given()
+                                .when().get("/city")
+                                .then()
+                                .statusCode(200)
+                                .body(
+                                                containsString("Montpellier"),
+                                                containsString("Paris"),
+                                                containsString("Avignon"),
+                                                containsString("Bordeaux"));
 
-        
+                // List all, cherry should be missing now:
+                // given()
+                // .when().get("/city")
+                // .then()
+                // .statusCode(200)
+                // .body(
+                // containsString("Montpellier"),
+                // containsString("Paris"),
+                // containsString("Avignon"),
+                // not(containsString("Bordeaux"))
+                // );
+        }
 
-        //List all, cherry should be missing now:
-        given()
-                .when().get("/fruits")
-                .then()
-                .statusCode(200)
-                .body(
-                        not(containsString("Cherry")),
-                        containsString("Apple"),
-                        containsString("Banana"),
-                        containsString("Pear"));
-    }
+        @Test
+        public void testListAllCity() {
+                // List all, should have Montpellier the database has initially:
+                given()
+                                .when().get("/city")
+                                .then()
+                                .statusCode(200)
+                                .body(
+                                                containsString("Montpellier"),
+                                                containsString("Paris"),
+                                                containsString("Avignon"));
+        }
 
 }
