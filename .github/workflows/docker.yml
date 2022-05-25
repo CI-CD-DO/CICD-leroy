@@ -22,6 +22,6 @@ jobs:
       name: Build and push the Dockerfile
       uses: docker/build-push-action@v3
       with:
-        context : ./src/main/docker
-        file: Dockerfile.jvm
+
+        file: ./src/main/docker/
         tags: gridexx/city-api:latest
