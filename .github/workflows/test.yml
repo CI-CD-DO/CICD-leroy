@@ -1,10 +1,10 @@
 #Make a job that test
-name: Quarkus test
+name: Tests
 
 on: [push]
 
 jobs:
-  docker:
+  test:
     runs-on: ubuntu-latest
 
     steps:
@@ -15,6 +15,6 @@ jobs:
       name: Compile the package Quarkus
       run : mvn -N io.takari:maven:wrapper
     - 
-      name: Test Quarkus
+      name: run tests
       run : mvn test
     
