@@ -9,25 +9,27 @@ import org.junit.jupiter.api.Test;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-public class FruitsEndpointTest {
+public class CityEndpointTest {
 
     @Test
-    public void testListAllFruits() {
-        //List all, should have all 3 fruits the database has initially:
+    public void testListAllCity() {
+        //List all, should have Montpellier the database has initially:
         given()
-                .when().get("/fruits")
+                .when().get("/city")
                 .then()
                 .statusCode(200)
                 .body(
-                        containsString("Cherry"),
-                        containsString("Apple"),
-                        containsString("Banana"));
+                        containsString("Montpellier")
+                        );
 
-        //Delete the Cherry:
+        //Create Paris:
         given()
-                .when().delete("/fruits/1")
+                .when()
+                .body("{\"name\" : \"Pear\"}")
+                .contentType("application/json")
+                .post("/fruit")
                 .then()
-                .statusCode(204);
+                .statusCode(201);
 
         //List all, cherry should be missing now:
         given()
@@ -39,14 +41,7 @@ public class FruitsEndpointTest {
                         containsString("Apple"),
                         containsString("Banana"));
 
-        //Create the Pear:
-        given()
-                .when()
-                .body("{\"name\" : \"Pear\"}")
-                .contentType("application/json")
-                .post("/fruits")
-                .then()
-                .statusCode(201);
+        
 
         //List all, cherry should be missing now:
         given()
