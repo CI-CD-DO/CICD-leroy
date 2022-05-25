@@ -63,36 +63,36 @@ public class CityResource {
 
     
 
-    // @PUT
-    // @Path("{id}")
-    // @Transactional
-    // public City update(Integer id, City city) {
-    //     if (city.getName() == null) {
-    //         throw new WebApplicationException("City Name was not set on request.", 422);
-    //     }
+    @PUT
+    @Path("{id}")
+    @Transactional
+    public City update(Integer id, City city) {
+        if (city.getName() == null) {
+            throw new WebApplicationException("City Name was not set on request.", 422);
+        }
 
-    //     City entity = entityManager.find(City.class, id);
+        City entity = entityManager.find(City.class, id);
 
-    //     if (entity == null) {
-    //         throw new WebApplicationException("City with id of " + id + " does not exist.", 404);
-    //     }
+        if (entity == null) {
+            throw new WebApplicationException("City with id of " + id + " does not exist.", 404);
+        }
 
-    //     entity.setName(city.getName());
+        entity.setName(city.getName());
 
-    //     return entity;
-    // }
+        return entity;
+    }
 
-    // @DELETE
-    // @Path("{id}")
-    // @Transactional
-    // public Response delete(Integer id) {
-    //     City entity = entityManager.getReference(City.class, id);
-    //     if (entity == null) {
-    //         throw new WebApplicationException("City with id of " + id + " does not exist.", 404);
-    //     }
-    //     entityManager.remove(entity);
-    //     return Response.status(204).build();
-    // }
+    @DELETE
+    @Path("{id}")
+    @Transactional
+    public Response delete(Integer id) {
+        City entity = entityManager.getReference(City.class, id);
+        if (entity == null) {
+            throw new WebApplicationException("City with id of " + id + " does not exist.", 404);
+        }
+        entityManager.remove(entity);
+        return Response.status(204).build();
+    }
 
     @Provider
     public static class ErrorMapper implements ExceptionMapper<Exception> {
