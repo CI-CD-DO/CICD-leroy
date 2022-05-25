@@ -11,6 +11,8 @@ jobs:
     -
       name: Checkout the code
       uses: actions/checkout@v2
+    - 
+      name: Compile the package Quarkus
       run : ./mvnw package -DskipTests
 
     -
