@@ -23,74 +23,76 @@ import org.jboss.logging.Logger;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-@Path("fruits")
+@Path("city")
 @ApplicationScoped
 @Produces("application/json")
 @Consumes("application/json")
-public class FruitResource {
+public class CityResource {
 
-    private static final Logger LOGGER = Logger.getLogger(FruitResource.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(CityResource.class.getName());
 
     @Inject
     EntityManager entityManager;
 
     @GET
-    public List<Fruit> get() {
-        return entityManager.createNamedQuery("Fruits.findAll", Fruit.class)
+    public List<City> get() {
+        return entityManager.createNamedQuery("City.findAll", City.class)
                 .getResultList();
-    }
-
-    @GET
-    @Path("{id}")
-    public Fruit getSingle(Integer id) {
-        Fruit entity = entityManager.find(Fruit.class, id);
-        if (entity == null) {
-            throw new WebApplicationException("Fruit with id of " + id + " does not exist.", 404);
-        }
-        return entity;
     }
 
     @POST
     @Transactional
-    public Response create(Fruit fruit) {
-        if (fruit.getId() != null) {
+    public Response create(City city) {
+        if (city.getId() != null) {
             throw new WebApplicationException("Id was invalidly set on request.", 422);
         }
 
-        entityManager.persist(fruit);
-        return Response.ok(fruit).status(201).build();
+        entityManager.persist(city);
+        return Response.ok(city).status(201).build();
     }
 
-    @PUT
-    @Path("{id}")
-    @Transactional
-    public Fruit update(Integer id, Fruit fruit) {
-        if (fruit.getName() == null) {
-            throw new WebApplicationException("Fruit Name was not set on request.", 422);
-        }
+    // @GET
+    // @Path("{id}")
+    // public City getSingle(Integer id) {
+    //     City entity = entityManager.find(City.class, id);
+    //     if (entity == null) {
+    //         throw new WebApplicationException("City with id of " + id + " does not exist.", 404);
+    //     }
+    //     return entity;
+    // }
 
-        Fruit entity = entityManager.find(Fruit.class, id);
+    
 
-        if (entity == null) {
-            throw new WebApplicationException("Fruit with id of " + id + " does not exist.", 404);
-        }
+    // @PUT
+    // @Path("{id}")
+    // @Transactional
+    // public City update(Integer id, City city) {
+    //     if (city.getName() == null) {
+    //         throw new WebApplicationException("City Name was not set on request.", 422);
+    //     }
 
-        entity.setName(fruit.getName());
+    //     City entity = entityManager.find(City.class, id);
 
-        return entity;
-    }
+    //     if (entity == null) {
+    //         throw new WebApplicationException("City with id of " + id + " does not exist.", 404);
+    //     }
 
-    @DELETE
-    @Path("{id}")
-    @Transactional
-    public Response delete(Integer id) {
-        Fruit entity = entityManager.getReference(Fruit.class, id);
-        if (entity == null) {
-            throw new WebApplicationException("Fruit with id of " + id + " does not exist.", 404);
-        }
-        entityManager.remove(entity);
-        return Response.status(204).build();
-    }
+    //     entity.setName(city.getName());
+
+    //     return entity;
+    // }
+
+    // @DELETE
+    // @Path("{id}")
+    // @Transactional
+    // public Response delete(Integer id) {
+    //     City entity = entityManager.getReference(City.class, id);
+    //     if (entity == null) {
+    //         throw new WebApplicationException("City with id of " + id + " does not exist.", 404);
+    //     }
+    //     entityManager.remove(entity);
+    //     return Response.status(204).build();
+    // }
 
     @Provider
     public static class ErrorMapper implements ExceptionMapper<Exception> {
