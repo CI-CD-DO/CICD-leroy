@@ -23,5 +23,5 @@ jobs:
       uses: docker/build-push-action@v3
       with:
 
-        file: ./src/main/docker/
+        file: ./src/main/docker/Dockerfile.jvm
         tags: gridexx/city-api:latest
