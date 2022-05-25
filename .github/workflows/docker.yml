@@ -13,7 +13,9 @@ jobs:
       uses: actions/checkout@v2
     - 
       name: Compile the package Quarkus
-      run : ./mvnw package -DskipTests
+      run : |
+        mvn -N io.takari:maven:wrapper
+        ./mvnw package -DskipTests
 
     -
       name: Login to Docker Hub
