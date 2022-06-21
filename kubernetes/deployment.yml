@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment
+  labels:
+    app: quarkus-city-api
+    version: 1.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quarkus-city-api
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: quarkus-city-api
+        version: 1.0.0
+    spec:
+      containers:
+      - name: quarkus-city-api
+        image: gridexx/city-api:1.1.0
+        env:
+        - name: QUARKUS_DATASOURCE_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: QUARKUS_DATASOURCE_USERNAME
+        - name: QUARKUS_DATASOURCE_JDBC_URL
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: QUARKUS_DATASOURCE_JDBC_URL
+        - name: QUARKUS_DATASOURCE_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: QUARKUS_DATASOURCE_PASSWORD    
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quarkus-database
+  labels:
+    app: quarkus-database
+    version: 1.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quarkus-database
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: quarkus-database
+        version: 1.0.0
+    spec:
+      containers:
+      - name: quarkus-database
+        image: postgres:14
