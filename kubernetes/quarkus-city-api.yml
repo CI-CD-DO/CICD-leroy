@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deployment-quarkus-city-api
+  labels:
+    app: quarkus-city-api
+    version: 1.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quarkus-city-api
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: quarkus-city-api
+        version: 1.0.0
+    spec:
+      containers:
+      - name: quarkus-city-api
+        image: gridexx/city-api:1.3.0
+        env:
+        - name: CITY_API_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: CITY_API_DB_USER
+        - name: CITY_API_DB_PWD
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: CITY_API_DB_PWD
+        - name: CITY_API_DB_URL
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: CITY_API_DB_URL   

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quarkus-database
+  labels:
+    app: quarkus-database
+    version: 1.0.0
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: quarkus-database
+      version: 1.0.0
+  template:
+    metadata:
+      labels:
+        app: quarkus-database
+        version: 1.0.0
+    spec:
+      containers:
+      - name: quarkus-database
+        image: postgres:14
+        env:
+        - name: POSTGRES_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: CITY_API_DB_USER
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: CITY_API_DB_PWD
+        - name: POSTGRES_DB
+          value: "postgres"
