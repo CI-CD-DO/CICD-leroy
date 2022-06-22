@@ -1,16 +1,41 @@
-FROM maven:3.8.5-openjdk-18
+FROM maven:3.8.5-openjdk-18 AS builder
 
 COPY . .
 RUN mvn -N io.takari:maven:wrapper
-RUN mvn package -Dnative -Dquarkus.native.container-build=true -Dquarkus.native.container-runtime=docker
-WORKDIR /work/
-RUN chown 1001 /work \
-    && chmod "g+rwX" /work \
-    && chown 1001:root /work
-COPY --chown=1001:root target/*-runner /work/application
-ENV LISTEN="0.0.0.0"
+RUN mvn package -DskipTests
+
+FROM registry.access.redhat.com/ubi8/ubi-minimal:8.3 AS runner
+
+COPY --from=builder ./target .
+
+ARG JAVA_PACKAGE=java-11-openjdk-headless
+ARG RUN_JAVA_VERSION=1.3.8
+ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en'
+# Install java and the run-java script
+# Also set up permissions for user `1001`
+RUN microdnf install curl ca-certificates ${JAVA_PACKAGE} \
+    && microdnf update \
+    && microdnf clean all \
+    && mkdir /deployments \
+    && chown 1001 /deployments \
+    && chmod "g+rwX" /deployments \
+    && chown 1001:root /deployments \
+    && curl https://repo1.maven.org/maven2/io/fabric8/run-java-sh/${RUN_JAVA_VERSION}/run-java-sh-${RUN_JAVA_VERSION}-sh.sh -o /deployments/run-java.sh \
+    && chown 1001 /deployments/run-java.sh \
+    && chmod 540 /deployments/run-java.sh \
+    && echo "securerandom.source=file:/dev/urandom" >> /etc/alternatives/jre/lib/security/java.security
+
+# Configure the JAVA_OPTIONS, you can add -XshowSettings:vm to also display the heap size.
+ENV JAVA_OPTIONS="-Dquarkus.http.host=0.0.0.0 -Djava.util.logging.manager=org.jboss.logmanager.LogManager"
+# We make four distinct layers so if there are application changes the library layers can be re-used
+COPY --chown=1001 target/quarkus-app/lib/ /deployments/lib/
+COPY --chown=1001 target/quarkus-app/*.jar /deployments/
+COPY --chown=1001 target/quarkus-app/app/ /deployments/app/
+COPY --chown=1001 target/quarkus-app/quarkus/ /deployments/quarkus/
+
 EXPOSE 8080
 USER 1001
 
-CMD ["./application", "-Dquarkus.http.host=${LISTEN}"]
+ENTRYPOINT [ "/deployments/run-java.sh" ]
+
 
