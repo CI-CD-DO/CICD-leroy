@@ -1,119 +1,56 @@
-# Quarkus demo: Hibernate ORM and RESTEasy
+# CI/CD  
 
-This is a minimal CRUD service exposing a couple of endpoints over REST,
-with a front-end based on Angular so you can play with it from your browser.
+Fougerouse Arsène
+Langlet Alexis
 
-While the code is surprisingly simple, under the hood this is using:
- - RESTEasy to expose the REST endpoints
- - Hibernate ORM to perform the CRUD operations on the database
- - A PostgreSQL database; see below to run one via Docker
- - ArC, the CDI inspired dependency injection tool with zero overhead
- - The high performance Agroal connection pool
- - Infinispan based caching
- - All safely coordinated by the Narayana Transaction Manager
+Polytech DO3
 
-## Requirements
+## Questions
 
-To compile and run this demo you will need:
+1) Créez un fichier `docker-compose.yml` et ajoutez-y un service `db` s'appuyant sur l'image Docker `postgres:latest`. 
+  
+Un fichier `docker-compose.yml` a été créé. Comme L'ORM de quarkus utilise postgres:14 nous avons décidé d'utiliser cette image plutôt que la latest.  
 
-- JDK 11+
-- GraalVM
-
-In addition, you will need either a PostgreSQL database, or Docker to run one.
-
-### Configuring GraalVM and JDK 11+
-
-Make sure that both the `GRAALVM_HOME` and `JAVA_HOME` environment variables have
-been set, and that a JDK 11+ `java` command is on the path.
-
-See the [Building a Native Executable guide](https://quarkus.io/guides/building-native-image)
-for help setting up your environment.
-
-## Building the demo
-
-Launch the Maven build on the checked out sources of this demo:
-
-> ./mvnw package
-
-## Running the demo
-
-### Live coding with Quarkus
-
-The Maven Quarkus plugin provides a development mode that supports
-live coding. To try this out:
-
-> ./mvnw quarkus:dev
-
-In this mode you can make changes to the code and have the changes immediately applied, by just refreshing your browser.
-
-Hot reload works even when modifying your JPA entities.
-Try it! Even the database schema will be updated on the fly.
-
-### Run Quarkus in JVM mode
-
-When you're done iterating in developer mode, you can run the application as a
-conventional jar file.
-
-First compile it:
-
-> ./mvnw package
-
-Next we need to make sure you have a PostgreSQL instance running (Quarkus automatically starts one for dev and test mode). To set up a PostgreSQL database with Docker:
-
-> docker run --rm=true --name quarkus_test -e POSTGRES_USER=quarkus_test -e POSTGRES_PASSWORD=quarkus_test -e POSTGRES_DB=quarkus_test -p 5432:5432 postgres:13.3
-
-Connection properties for the Agroal datasource are defined in the standard Quarkus configuration file,
-`src/main/resources/application.properties`.
-
-Then run it:
-
-> java -jar ./target/quarkus-app/quarkus-run.jar
-
-Have a look at how fast it boots.
-Or measure total native memory consumption...
-
-### Run Quarkus as a native application
-
-You can also create a native executable from this application without making any
-source code changes. A native executable removes the dependency on the JVM:
-everything needed to run the application on the target platform is included in
-the executable, allowing the application to run with minimal resource overhead.
-
-Compiling a native executable takes a bit longer, as GraalVM performs additional
-steps to remove unnecessary codepaths. Use the  `native` profile to compile a
-native executable:
-
-> ./mvnw package -Dnative
-
-After getting a cup of coffee, you'll be able to run this binary directly:
-
-> ./target/hibernate-orm-quickstart-1.0.0-SNAPSHOT-runner
-
-Please brace yourself: don't choke on that fresh cup of coffee you just got.
+2) Créez une base de données `city_api` avec une table `city`.  
     
-Now observe the time it took to boot, and remember: that time was mostly spent to generate the tables in your database and import the initial data.
-    
-Next, maybe you're ready to measure how much memory this service is consuming.
+L'ORM de quarkus nous permet de créer automatiquement cette table à partir de la description de l'entité.
+Afin, de peupler un peu cette base de données, nous avons créé un fichier `import.sql` contenant quelques exemples de villes.
 
-N.B. This implies all dependencies have been compiled to native;
-that's a whole lot of stuff: from the bytecode enhancements that Hibernate ORM
-applies to your entities, to the lower level essential components such as the PostgreSQL JDBC driver, the Undertow webserver.
 
-## See the demo in your browser
+3) Dans le langage de votre choix, créez un service web. 
 
-Navigate to:
+Pour cet exercice, nous avons opté pour le langage Java. Afin de nous permettre de créer facilement un service web, nous avons choisi d'utiliser le framework Quarkus.  
+Les routes API ont bien été implémentées, leurs implémentations sont trouvables dans `CityResource.java` et `HealthResource.java`.  
 
-<http://localhost:8080/index.html>
+La lecture des variables d'environnement est configurée dans `application.properties` grace aux paramètres de configuration de Quarkus.  
 
-Have fun, and join the team of contributors!
+4) Écrivez des tests :  
 
-## Running the demo in Kubernetes
+Des tests sur les différents endpoints ont été mis en place dans `CityEndpointTest.java` et `HealthEndpointTest.java`. 
+Ils sont executables en lancant la commande ```mvn quarkus:test``` ou la commande ```mvn test```
+L'ORM de doctrine nous permet d'insérer dans la base de données, puis d'annuler les changements. 
 
-This section provides extra information for running both the database and the demo on Kubernetes.
-As well as running the DB on Kubernetes, a service needs to be exposed for the demo to connect to the DB.
+5) Écrivez un fichier `Dockerfile` à la racine de votre projet. Testez que votre image Docker est correcte.  
+Notre dockerfile est correct, pour build correctement le projet, il faut executer
 
-Then, rebuild demo docker image with a system property that points to the DB. 
+6) Écrivez un workflow GitHub Actions `ci` pour qu'un linter soit exécuté à chaque push.
 
-```bash
--Dquarkus.datasource.jdbc.url=jdbc:postgresql://<DB_SERVICE_NAME>/quarkus_test
-```
+7) Modifiez le workflow pour que les tests s'exécutent à chaque push.
+
+8) Modifiez le workflow pour qu'un build de l'image Docker soit réalisé à chaque push.
+
+9) Modifiez le workflow pour que l'image Docker soit push sur `ghcr.io` avec pour tag `city-api:latest`.
+
+10) Écrivez un workflow GitHub Actions `release` qui, lorsqu'un tag au format `vX.X.X` soit poussé build et push l'image Docker avec un tag `city-api:X.X.X`.
+
+11) Installez Minikube sur votre machine local.
+
+12) Écrivez un chart Helm de déploiement de l'application.
+
+13) Déployez votre application dans votre Minikube.
+
+14) Ajouter un endpoint `/metrics` compatible Prometheus (des [libs](https://sysdig.com/blog/prometheus-metrics/) sont disponibles).
+
+15) Ajoutez un Prometheus dans votre docker-compose qui scrappe les métriques de votre application.
+
+16) Ajoutez un Grafana dans votre docker-compose et créez y un dahsboard pour monitorer votre application.
