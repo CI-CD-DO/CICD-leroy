@@ -1,0 +1,15 @@
+version: '3.7'
+
+volumes:
+  postgres:
+
+services:
+  postgres:
+    image: postgres:14 #Quarkus use postgres:14
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=$CITY_API_DB_USER
+      - POSTGRES_PASSWORD=$CITY_API_DB_PWD
+      - POSTGRES_DATABASE=postgres
