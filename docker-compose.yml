@@ -13,3 +13,16 @@ services:
       - POSTGRES_USER=$CITY_API_DB_USER
       - POSTGRES_PASSWORD=$CITY_API_DB_PWD
       - POSTGRES_DATABASE=postgres
+
+  quarkus-city-api:
+    image: gridexx/city-api:latest
+    depends_on:
+      - postgres
+    restart: always
+    ports:
+      - 8080:${CITY_API_PORT}
+    environment:
+      - CITY_API_PORT=${CITY_API_PORT}
+      - CITY_API_DB_USER=$CITY_API_DB_USER
+      - CITY_API_DB_PWD=$CITY_API_DB_PWD
+      - CITY_API_DB_URL=jdbc:postgresql://postgres:5432/postgres

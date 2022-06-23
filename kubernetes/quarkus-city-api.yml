@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
       - name: quarkus-city-api
-        image: gridexx/city-api:1.3.0
+        image: gridexx/city-api:1.4.0
         env:
         - name: CITY_API_DB_USER
           valueFrom:
@@ -36,3 +36,8 @@ spec:
             secretKeyRef:
               name: city-api-secret
               key: CITY_API_DB_URL   
+        - name: CITY_API_PORT
+          valueFrom:
+            secretKeyRef:
+              name: city-api-secret
+              key: CITY_API_PORT
