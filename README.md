@@ -31,17 +31,24 @@ Ils sont executables en lancant la commande ```mvn quarkus:test``` ou la command
 L'ORM de doctrine nous permet d'insérer dans la base de données, puis d'annuler les changements. 
 
 5) Écrivez un fichier `Dockerfile` à la racine de votre projet. Testez que votre image Docker est correcte.  
-Notre dockerfile est correct, pour build correctement le projet, il faut executer
+
+Notre dockerfile est correct, pour build correctement le projet, il utilise une image maven, pour le run correctement la commande `docker run --net=host --env-file=.env image_name` suffit.  
 
 6) Écrivez un workflow GitHub Actions `ci` pour qu'un linter soit exécuté à chaque push.
 
-7) Modifiez le workflow pour que les tests s'exécutent à chaque push.
+7) Modifiez le workflow pour que les tests s'exécutent à chaque push.  
+
+Pour lancer les tests à chaque push, il nous a suffit de créer un pipeline lancant un mvn test sur notre projet. 
 
 8) Modifiez le workflow pour qu'un build de l'image Docker soit réalisé à chaque push.
 
-9) Modifiez le workflow pour que l'image Docker soit push sur `ghcr.io` avec pour tag `city-api:latest`.
+9) Modifiez le workflow pour que l'image Docker soit push sur `ghcr.io` avec pour tag `city-api:latest`. 
+Les services de ghcr.io posant problèmes, nous avons décidé de push sur docker.io à la place. 
+Nous utilisons pour cela l'action github [docker/build-push-action](https://github.com/docker/build-push-action/blob/master/docs/advanced/tags-labels.md) pour créer notre image et la pousser sur le répertoire docker d'Arsène.  
 
-10) Écrivez un workflow GitHub Actions `release` qui, lorsqu'un tag au format `vX.X.X` soit poussé build et push l'image Docker avec un tag `city-api:X.X.X`.
+10) Écrivez un workflow GitHub Actions `release` qui, lorsqu'un tag au format `vX.X.X` soit poussé build et push l'image Docker avec un tag `city-api:X.X.X`. 
+
+Afin de faire cela simplement, on rajoute simplement une étape dans notre job précédent, celle-ci utilise [docker/metadata-action](https://github.com/docker/metadata-action) et nous permets de créer les bonnes images avec les bons tags en fonction des commits.  
 
 11) Installez Minikube sur votre machine local.
 
