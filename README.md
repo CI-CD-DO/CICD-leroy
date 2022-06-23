@@ -31,14 +31,16 @@ Ils sont executables en lancant la commande ```mvn quarkus:test``` ou la command
 L'ORM de doctrine nous permet d'insérer dans la base de données, puis d'annuler les changements. 
 
 5) Écrivez un fichier `Dockerfile` à la racine de votre projet. Testez que votre image Docker est correcte.  
+Notre dockerfile est correct, pour build correctement le projet, il faut executer.
 
-Notre dockerfile est correct, pour build correctement le projet, il utilise une image maven, pour le run correctement la commande `docker run --net=host --env-file=.env image_name` suffit.  
+Les workflows GitHub ont été écrit dans le dossier `.github/workflows`.
 
 6) Écrivez un workflow GitHub Actions `ci` pour qu'un linter soit exécuté à chaque push.
 
-7) Modifiez le workflow pour que les tests s'exécutent à chaque push.  
+Une partie de la CI se base sur les outils de [SonarCloud](https://sonarcloud.io/). Ce site lance de la CI sur des projets JAVA et permet d'avoir un report concernant la qualité de code. Il affiche les vulnérabilité des packages utilisés, mais également le pourcentage de code couvert par les tests.
+Il n'y a malheureusement pas de linters connus pour le langage Java, donc nous n'avons pas pu en utiliser pour la CI.
 
-Pour lancer les tests à chaque push, il nous a suffit de créer un pipeline lancant un mvn test sur notre projet. 
+7) Modifiez le workflow pour que les tests s'exécutent à chaque push.
 
 8) Modifiez le workflow pour qu'un build de l'image Docker soit réalisé à chaque push.
 
@@ -50,14 +52,16 @@ Nous utilisons pour cela l'action github [docker/build-push-action](https://gith
 
 Afin de faire cela simplement, on rajoute simplement une étape dans notre job précédent, celle-ci utilise [docker/metadata-action](https://github.com/docker/metadata-action) et nous permets de créer les bonnes images avec les bons tags en fonction des commits.  
 
-11) Installez Minikube sur votre machine local.
+11+12+13)
 
-12) Écrivez un chart Helm de déploiement de l'application.
+### Déploiement de l'application sur un cluster Kubernetes local
 
-13) Déployez votre application dans votre Minikube.
+L'application à été déployée sur un cluster Kubernetes en local via Minikube. L'installation de Minikube s'est faite en suivant la  [documentation](https://kubernetes.io/docs/tasks/tools/).
 
-14) Ajouter un endpoint `/metrics` compatible Prometheus (des [libs](https://sysdig.com/blog/prometheus-metrics/) sont disponibles).
+Les différentes ressources nécessaires au déploiement sont décrites dans le dossier `kubernetes`.
 
-15) Ajoutez un Prometheus dans votre docker-compose qui scrappe les métriques de votre application.
+la base de données et l'API sont chacune déployées sur un pod. Cette dernière utilise la dernière image docker poussée sur [docker](hub.docker.com) via le workflow GitHub.
 
-16) Ajoutez un Grafana dans votre docker-compose et créez y un dahsboard pour monitorer votre application.
+Les variables d'environnements sont injectées dans les pods via un service `Secret` qui permet de les encoder en base64. Pour assurer la communication entre l'API et la base de données, le service `postgres-database-service.yml` définit le nom de domaine `quarkus-database`. Il est utilisé dans la variable d'environnement `CITY_API_DB_URL: "jdbc:postgresql://quarkus-database/postgres` par l'API. Afin de 
+
+Par manque de temps, nous n'avons pas pu implémenter le déploiement de l'application sur un cluster Kubernetes via un Chart Helm, n'y s'occuper du Ingress Controlleur.
