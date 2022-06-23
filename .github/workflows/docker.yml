@@ -24,16 +24,11 @@ jobs:
       with:
         images: |
           gridexx/city-api
-    - 
-      name: Compile the package Quarkus
-      run : |
-        mvn -N io.takari:maven:wrapper
-        ./mvnw package -DskipTests
     -
       name: Build and push the Dockerfile with tags
       uses: docker/build-push-action@v3
       with:
-        file: ./src/main/docker/Dockerfile.jvm
+        file: ./Dockerfile
         push: true
         context: .
         tags: ${{ steps.meta.outputs.tags }}
